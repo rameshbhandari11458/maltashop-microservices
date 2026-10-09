@@ -1,0 +1,82 @@
+
+services:
+  order-db:
+    image: mysql:8.4
+    container_name: maltashop-order-db
+    environment:
+      MYSQL_DATABASE: order_db
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3307:3306"
+    volumes:
+      - order-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  notification-db:
+    image: mysql:8.4
+    container_name: maltashop-notification-db
+    environment:
+      MYSQL_DATABASE: notification_db
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3308:3306"
+    volumes:
+      - notification-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: maltashop-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  order-service:
+    build: ./order-service
+    container_name: maltashop-order-service
+    environment:
+      DB_URL: jdbc:mysql://order-db:3306/order_db
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+    ports:
+      - "8080:8080"
+    depends_on:
+      order-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+
+  notification-service:
+    build: ./notification-service
+    container_name: maltashop-notification-service
+    environment:
+      DB_URL: jdbc:mysql://notification-db:3306/notification_db
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+    ports:
+      - "8081:8081"
+    depends_on:
+      notification-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+
+volumes:
+  order-db-data:
+  notification-db-data:
