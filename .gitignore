@@ -1,0 +1,28 @@
+# Java compiled files
+*.class
+*.jar
+!mvnw
+!mvnw.cmd
+
+# Maven build output
+**/target/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+out/
+
+# VS Code
+.vscode/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
