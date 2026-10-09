@@ -1,0 +1,30 @@
+name: MaltaShop CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Build and test Order Service
+        working-directory: order-service
+        run: chmod +x mvnw && ./mvnw --batch-mode clean verify
+
+      - name: Build and test Notification Service
+        working-directory: notification-service
+        run: chmod +x mvnw && ./mvnw --batch-mode clean verify
