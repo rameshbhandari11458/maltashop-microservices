@@ -1,3 +1,4 @@
+
 package com.maltashop.order_service.service;
 
 import com.maltashop.order_service.dto.OrderRequest;
@@ -6,6 +7,8 @@ import com.maltashop.order_service.event.OrderEventPublisher;
 import com.maltashop.order_service.event.OrderPlacedEvent;
 import com.maltashop.order_service.repository.OrderRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class OrderService {
@@ -33,12 +36,15 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
+        String correlationId = UUID.randomUUID().toString();
+
         OrderPlacedEvent event = new OrderPlacedEvent(
                 savedOrder.getId(),
                 savedOrder.getId(),
                 savedOrder.getCustomerId(),
                 savedOrder.getProductId(),
-                savedOrder.getQuantity()
+                savedOrder.getQuantity(),
+                correlationId
         );
 
         eventPublisher.publishOrderPlaced(event);

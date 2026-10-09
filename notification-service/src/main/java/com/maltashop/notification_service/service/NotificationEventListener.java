@@ -1,3 +1,4 @@
+
 package com.maltashop.notification_service.service;
 
 import com.maltashop.notification_service.config.RabbitMQConfig;
@@ -14,24 +15,24 @@ public class NotificationEventListener {
 
     public NotificationEventListener(
             NotificationRepository notificationRepository) {
-
         this.notificationRepository = notificationRepository;
     }
 
-    @RabbitListener(
-            queues = RabbitMQConfig.ORDER_QUEUE
-    )
+    @RabbitListener(queues = RabbitMQConfig.ORDER_QUEUE)
     public void handleOrderPlaced(OrderPlacedEvent event) {
 
         System.out.println(
                 "Received OrderPlaced event for order: "
                         + event.getOrderId()
+                        + ", correlationId: "
+                        + event.getCorrelationId()
         );
 
         Notification notification = new Notification(
                 event.getOrderId(),
                 event.getCustomerId(),
-                "Order " + event.getOrderId() + " has been placed successfully.",
+                "Order " + event.getOrderId()
+                        + " has been placed successfully.",
                 "SENT"
         );
 
@@ -40,6 +41,8 @@ public class NotificationEventListener {
         System.out.println(
                 "Notification saved for order: "
                         + event.getOrderId()
+                        + ", correlationId: "
+                        + event.getCorrelationId()
         );
     }
 }

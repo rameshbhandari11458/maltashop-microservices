@@ -1,3 +1,4 @@
+
 package com.maltashop.order_service.event;
 
 import com.maltashop.order_service.config.RabbitMQConfig;
@@ -9,11 +10,9 @@ public class OrderEventPublisher {
 
     private final RabbitTemplate rabbitTemplate;
 
-
     public OrderEventPublisher(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
-
 
     public void publishOrderPlaced(OrderPlacedEvent event) {
 
@@ -26,6 +25,8 @@ public class OrderEventPublisher {
         System.out.println(
                 "OrderPlaced event published for order: "
                         + event.getOrderId()
+                        + ", correlationId: "
+                        + event.getCorrelationId()
         );
     }
 }
